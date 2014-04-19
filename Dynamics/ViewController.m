@@ -19,6 +19,7 @@
 @property (strong, nonatomic) UICollisionBehavior * collision;
 @property (strong, nonatomic) UISnapBehavior *snap;
 @property (strong, nonatomic) UIAttachmentBehavior *attachment;
+@property (strong, nonatomic) UIDynamicItemBehavior *dynamicItemBehavior;
 
 @property (weak, nonatomic) UIView *movedView;
 @property (weak, nonatomic) UIView *selectedView;
@@ -55,7 +56,15 @@
         [self.animator addBehavior: cB];
         cB;
     });
-    
+    self.dynamicItemBehavior = ({
+        UIDynamicItemBehavior *behavior = [[UIDynamicItemBehavior alloc] initWithItems:@[self.viewAnimated]];
+        behavior.resistance = 0.f;
+        behavior.allowsRotation = NO;
+        behavior.elasticity = 0.f;
+        behavior.friction = 0.f;
+        [self.animator addBehavior:behavior];
+        behavior;
+    });
     UICollisionBehavior *collision = [[UICollisionBehavior alloc] initWithItems:@[self.viewAnimated] ];
     collision.collisionDelegate = self;
     collision.translatesReferenceBoundsIntoBoundary = YES;
@@ -124,12 +133,11 @@
     [self.view insertSubview:childView belowSubview:self.viewAnimated];
     [self.viewAnimated addChild:childView];
     [self.collision addItem:childView];
-    
+    [self.dynamicItemBehavior addItem:childView];
     self.attachment = [[UIAttachmentBehavior alloc]initWithItem:self.viewAnimated attachedToItem:childView];
     self.attachment.length = self.viewAnimated.childViews.count <= 6 ? 100 : 200;
-    
     self.attachment.damping = 1.;
-    self.attachment.frequency = 10;
+    self.attachment.frequency = 6;
     
     [self.animator addBehavior:self.attachment];
 }

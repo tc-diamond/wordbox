@@ -90,9 +90,9 @@ static CGSize const kDefaultNodeViewSize = {77, 77};
 
 #pragma mark - Layout
 
-- (void)layoutSubviews
+- (void)layoutIfNeeded
 {
-    [super layoutSubviews];
+    [super layoutIfNeeded];
     
     self.label.center = self.center;
 }
