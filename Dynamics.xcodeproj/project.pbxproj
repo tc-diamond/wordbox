@@ -82,6 +82,13 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		301778EC19030E3E00E6E9D2 /* iPad */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = iPad;
+			sourceTree = "<group>";
+		};
 		30542C3D18F9B87F00FE1DE5 = {
 			isa = PBXGroup;
 			children = (
@@ -115,6 +122,7 @@
 		30542C4F18F9B87F00FE1DE5 /* Dynamics */ = {
 			isa = PBXGroup;
 			children = (
+				301778EC19030E3E00E6E9D2 /* iPad */,
 				30542C5818F9B87F00FE1DE5 /* AppDelegate.h */,
 				30542C5918F9B87F00FE1DE5 /* AppDelegate.m */,
 				30542C5B18F9B87F00FE1DE5 /* Main.storyboard */,
@@ -385,7 +393,9 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Dynamics/Dynamics-Prefix.pch";
 				INFOPLIST_FILE = "Dynamics/Dynamics-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -398,7 +408,9 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Dynamics/Dynamics-Prefix.pch";
 				INFOPLIST_FILE = "Dynamics/Dynamics-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
