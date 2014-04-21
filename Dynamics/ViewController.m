@@ -9,10 +9,10 @@
 #import "ViewController.h"
 #import "NodeView.h"
 
-@interface ViewController () <UICollisionBehaviorDelegate, UIDynamicAnimatorDelegate>
+@interface ViewController () <UICollisionBehaviorDelegate, UIDynamicAnimatorDelegate, NodeViewDelegate, UITextFieldDelegate>
 
+@property (weak, nonatomic) IBOutlet UITextField *textField;
 @property (weak, nonatomic) IBOutlet NodeView *viewAnimated;
-@property (weak, nonatomic) IBOutlet UIView *viewAnchor;
 
 @property (strong, nonatomic) UIDynamicAnimator *animator;
 @property (strong, nonatomic) UIGravityBehavior *gravity;
@@ -22,7 +22,7 @@
 @property (strong, nonatomic) UIDynamicItemBehavior *dynamicItemBehavior;
 
 @property (weak, nonatomic) UIView *movedView;
-@property (weak, nonatomic) UIView *selectedView;
+@property (weak, nonatomic) NodeView *selectedView;
 @property (strong, nonatomic) NodeView *parrentView;
 
 - (IBAction)addChild:(id)sender;
@@ -44,14 +44,17 @@
 {
     [super viewDidAppear:animated];
     
+    UIPanGestureRecognizer *gesture = [[UIPanGestureRecognizer alloc]initWithTarget:self action:@selector(panned:)];
+    [self.view addGestureRecognizer:gesture];
+    
     self.selectedView = self.viewAnimated;
     self.parrentView = self.viewAnimated;
+    self.viewAnimated.delegate = self;
     
     self.animator = [[UIDynamicAnimator alloc]initWithReferenceView:self.view];
     self.animator.delegate = self;
     
     self.viewAnimated.layer.cornerRadius = self.viewAnimated.bounds.size.width / 2;
-//    self.viewAnimated.userInteractionEnabled = NO;
     self.collision = ({
         UICollisionBehavior *cB = [[UICollisionBehavior alloc]initWithItems:@[self.viewAnimated]];
         cB.collisionDelegate = self;
@@ -72,26 +75,12 @@
     collision.translatesReferenceBoundsIntoBoundary = YES;
     [self.animator addBehavior:collision];
     
-    UIPanGestureRecognizer *gr = ({
-        UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc]initWithTarget:self action:@selector(panned:)];
-
-        pan;
-    });
-    [self.view addGestureRecognizer:gr];
-
-    UITapGestureRecognizer *tg = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(tapped:)];
-    [self.view addGestureRecognizer:tg];
-    
-    UILongPressGestureRecognizer *longpress = [[UILongPressGestureRecognizer alloc]initWithTarget:self action:@selector(longPressed:)];
-    [self.view addGestureRecognizer:longpress];
-    
     self.attachment.length = 100;
     
     self.attachment.damping = 1.;
     self.attachment.frequency = 10;
     
     [self.animator addBehavior:self.attachment];
-    
 }
 
 - (void)panned:(UIPanGestureRecognizer*)tg
@@ -111,29 +100,6 @@
         self.movedView = nil;
         self.snap = nil;
     }
-}
-
-- (void)tapped:(UITapGestureRecognizer*)tg
-{
-    UIView *tappedView = [self.view hitTest:[tg locationInView:self.view]
-                              withEvent:nil];
-    if ([self.view isEqual:tappedView] || !tappedView) {
-        return;
-    }
-    
-    self.snap = [[UISnapBehavior alloc]initWithItem:tappedView snapToPoint:self.view.center];
-    
-}
-
-- (void)longPressed:(UILongPressGestureRecognizer*)gr
-{
-    NodeView *pressedView = (NodeView*)[self.view hitTest:[gr locationInView:self.view]
-                                  withEvent:nil];
-    if ([self.view isEqual:pressedView] || !pressedView) {
-        return;
-    }
-    
-    self.parrentView = pressedView;
 }
 
 - (void)setSnap:(UISnapBehavior *)snap
@@ -159,7 +125,11 @@
 
 - (IBAction)addChild:(id)sender
 {
-    NodeView *childView = [[NodeView alloc]initWithWord:@"Test word" partOfSpeech:arc4random() % 3 parrent:self.parrentView];
+    NodeView *childView = [[NodeView alloc]initWithWord:@"Test word"
+                                           partOfSpeech:arc4random() % 3
+                                                parrent:self.parrentView];
+    childView.delegate = self;
+    
     [self.view insertSubview:childView belowSubview:self.parrentView];
     [self.parrentView addChild:childView];
     [self.collision addItem:childView];
@@ -170,6 +140,23 @@
     self.attachment.frequency = 6;
     
     [self.animator addBehavior:self.attachment];
+}
+
+- (void)nodeViewDidTap:(NodeView *)nodeView
+{
+    self.selectedView.selected = NO;
+    nodeView.selected = YES;
+    self.selectedView = nodeView;
+    
+    self.snap = nil;
+    self.snap = [[UISnapBehavior alloc]initWithItem:nodeView snapToPoint:self.view.center];
+}
+
+- (BOOL)textFieldShouldReturn:(UITextField *)textField
+{
+    [textField resignFirstResponder];
+    
+    return YES;
 }
 
 @end

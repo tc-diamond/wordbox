@@ -25,6 +25,7 @@ static CGSize const kDefaultNodeViewSize = {77, 77};
 {
     self = [super initWithFrame:frame];
     if (self) {
+        [self baseInit];
         [self configureWithPartOfSpeech:NodeViewPartOfSpeechUnknown parrent:self];
     }
     return self;
@@ -33,6 +34,7 @@ static CGSize const kDefaultNodeViewSize = {77, 77};
 - (instancetype)initWithCoder:(NSCoder *)aDecoder
 {
     if (self = [super initWithCoder:aDecoder]) {
+        [self baseInit];
         [self configureWithPartOfSpeech:NodeViewPartOfSpeechUnknown parrent:self];
     }
     return self;
@@ -41,10 +43,17 @@ static CGSize const kDefaultNodeViewSize = {77, 77};
 - (instancetype)initWithWord:(NSString*)word partOfSpeech:(NodeViewPartOfSpeech)partOfSpeech parrent:(NodeView *)parrent
 {
     if (self = [super init]) {
+        
         BOOL configureSuccess = [self configureWithPartOfSpeech:partOfSpeech parrent:parrent];
         self = configureSuccess ? self : nil;
     }
     return self;
+}
+
+- (void)baseInit
+{
+    UITapGestureRecognizer *tg = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(tapped:)];
+    [self addGestureRecognizer:tg];
 }
 
 - (BOOL)configureWithPartOfSpeech:(NodeViewPartOfSpeech)partOfSpeech parrent:(NodeView*)parrent
@@ -59,7 +68,8 @@ static CGSize const kDefaultNodeViewSize = {77, 77};
                             kDefaultNodeViewSize.height);
     self.center = CGPointMake(parrent.center.x + arc4random() % 20 - 10, parrent.center.y + arc4random() % 20 - 10);
     self.layer.cornerRadius = self.bounds.size.width / 2;
-    
+    self.layer.borderColor = [UIColor whiteColor].CGColor;
+
     self.label = [[UILabel alloc]initWithFrame:self.bounds];
     self.label.textColor = [UIColor whiteColor];
     self.label.numberOfLines = 0;
@@ -105,6 +115,33 @@ static CGSize const kDefaultNodeViewSize = {77, 77};
     [tempoChilds addObject:child];
     
     self.childViews = [tempoChilds copy];
+}
+
+#pragma mark - Delegate
+
+- (void)tapped:(UITapGestureRecognizer*)gesture
+{
+    if ([self.delegate respondsToSelector:@selector(nodeViewDidTap:)]) {
+        [self.delegate nodeViewDidTap:self];
+    }
+}
+
+#pragma mark - 
+
+- (void)setSelected:(BOOL)selected
+{
+    _selected = selected;
+    self.layer.borderWidth = selected ? 4.f : 0.f;
+
+    CGAffineTransform transform = self.transform;
+    
+    [UIView animateWithDuration:0.15 animations:^{
+        self.transform = CGAffineTransformScale(self.transform, 1.3, 1.3);
+    } completion:^(BOOL finished) {
+        [UIView animateWithDuration:0.15 animations:^{
+            self.transform = transform;
+        }];
+    }];
 }
 
 /*

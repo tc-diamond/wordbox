@@ -15,11 +15,22 @@ typedef NS_ENUM(NSUInteger, NodeViewPartOfSpeech){
     NodeViewPartOfSpeechUnknown
 };
 
+@class NodeView;
+@protocol NodeViewDelegate <NSObject>
+
+- (void)nodeViewDidTap:(NodeView*)nodeView;
+- (void)nodeViewDidLongPressed:(NodeView*)nodeView;
+
+@end
+
 @interface NodeView : UIView
 
-@property (assign, nonatomic) NodeViewPartOfSpeech partOfSpeech;
+@property (weak, nonatomic) id<NodeViewDelegate> delegate;
+
 @property (copy, nonatomic, readonly) NSArray *childViews;
 @property (strong, nonatomic) NodeView *parrentView;
+@property (assign, nonatomic) NodeViewPartOfSpeech partOfSpeech;
+@property (assign, nonatomic) BOOL selected;
 
 - (instancetype)initWithWord:(NSString*)word partOfSpeech:(NodeViewPartOfSpeech)partOfSpeech parrent:(NodeView*)parrent;
 - (void)addChild:(NodeView*)child;
